@@ -1,6 +1,8 @@
 This is just a basic app to show some daily information. The plan is to have it running on a
 raspberry pi as a "smart mirror" application.
 
+
+
 This is my first Python application, so I apologize for the horrendous code :/
 
 
