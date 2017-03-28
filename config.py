@@ -30,11 +30,11 @@ sports = {
 favoriteTeams = {
 	#Add the team abbreviations to its respective league
 	#Leave empty if no favorites for that league
-	'NFL': ['<Team Abbr>'],
+	'NFL': ['DEN'],
 	
-	'NBA': ['<Team Abbr>'],
+	'NBA': ['SAS'],
 	
-	'NHL': ['<Team Abbr>'],
+	'NHL': ['MIN'],
 	
-	'MLB': ['<Team Abbr>']	
+	'MLB': ['PHI']	
 }
