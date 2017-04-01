@@ -40,7 +40,6 @@ class TodaysGamesFrame(tk.Frame):
 		self.frameList = list()
 		
 		self.today = datetime.date.today()
-		self.lastUpdated = None
 		
 	def update_todays_games(self, leagueObj):
 		#Destroy frames and clear lists
@@ -50,7 +49,7 @@ class TodaysGamesFrame(tk.Frame):
 		self.frameList.clear()
 		
 		#Get games and create their frames
-		games = leagueObj.get_daily_games(self.today)
+		games = leagueObj.todaysGames
 		games.sort(key=lambda g: g.startTime, reverse=False)
 		
 		rowCount = 0
@@ -67,19 +66,19 @@ class TodaysGamesFrame(tk.Frame):
 	
 	def update_frame(self, leagueObj):
 		#Update if not yet set
-		if self.lastUpdated == None:
-			self.update_todays_games(leagueObj)
-			self.lastUpdated = datetime.datetime.now()
+		if leagueObj.lastGameUpdate == None or leagueObj.todaysGames == None:
+			leagueObj.get_daily_games(self.today)
 		
 		#Update if the day has changed
 		elif self.today != datetime.date.today():
 			self.today = datetime.date.today()
-			self.update_todays_games(leagueObj)
+			leagueObj.get_daily_games(self.today)
 			
 		#Update every 3 hours
-		elif (self.lastUpdated + datetime.timedelta(hours = 3)) < datetime.datetime.now():
-			self.update_todays_games(leagueObj)
-			self.lastUpdated = datetime.datetime.now()
+		elif (leagueObj.lastGameUpdate + datetime.timedelta(hours = 3)) < datetime.datetime.now():
+			leagueObj.get_daily_games(self.today)
+			
+		self.update_todays_games(leagueObj)
 		
 class LeagueFrame(tk.Frame):
 	def __init__(self, parent, leagueObj):

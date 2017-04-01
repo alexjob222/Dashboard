@@ -28,13 +28,13 @@ class SportsFeed(object):
 		
 			
 			for game in games.dailygameschedule.gameentry:
-				gameStartTime = self._subtract_hour(game.time)
+				gameStartTime = self._localize_time(game.time)
 				
 				gameObj = SportsGame(game.awayTeam.Abbreviation, 
 							game.homeTeam.Abbreviation, gameStartTime, self.league)	
 				gameList.append(gameObj)
-		except:
-			pass
+		except Exception as e:
+			print(e)
 		
 		self.lastGameUpdate = datetime.datetime.now()
 		self.todaysGames = gameList
@@ -42,7 +42,7 @@ class SportsFeed(object):
 		#Return the list of games
 		return gameList
 		
-	def get_season_start_and_end_year(self, date, regOrPost):
+	def _get_season_start_and_end_year(self, date, regOrPost):
 		'''This method may not be needed anymore. This was used to get the years needed for
 		 the API call. The API now allows the current season to be requested'''
 		#Determine start and end year based on when the league season starts
