@@ -90,5 +90,5 @@ ENV/
 
 #Files that may contain personal information
 config.py
-calendar_client_id.json
-calendar-info.json
+google_calendar/calendar_client_id.json
+google_calendar/.credentials/calendar-info.json

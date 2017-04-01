@@ -6,6 +6,24 @@ raspberry pi as a "smart mirror" application.
 This is my first Python application, so I apologize for the horrendous code :/
 
 
+API's used:
+
+Weather - http://openweathermap.org
+Calendar - Google Calendar API - https://developers.google.com/google-apps/calendar/quickstart/python
+Sports - https://www.mysportsfeeds.com/
+
+
+
+Shout out to HackerHouse for their simple and easy-to-follow smart mirror app.
+	https://github.com/HackerHouseYT/Smart-Mirror
+This project helped me understand some of the methods/packages I would need to make my project.
+
+
+I would also like to thank Yannick from www.flaticon.com for creating images used in the Weather module. 
+(These were the pictures used in HackerHouse's application as well)
+
+
+
 
 
 
