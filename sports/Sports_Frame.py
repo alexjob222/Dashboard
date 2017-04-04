@@ -146,8 +146,8 @@ class FavoriteTeamsFrame(tk.Frame):
 			elif self.leagueObjects[league].lastGameUpdate.date() != datetime.date.today():
 				self.leagueObjects[league].get_daily_games(datetime.date.today())
 				
-			#Update games every 4 hours
-			elif (self.leagueObjects[league].lastGameUpdate + datetime.timedelta(hours = 4)) < datetime.datetime.now():
+			#Update games every 3 hours
+			elif (self.leagueObjects[league].lastGameUpdate + datetime.timedelta(hours = 3)) < datetime.datetime.now():
 				self.leagueObjects[league].get_daily_games(datetime.date.today())
 				
 		#Update the game frames

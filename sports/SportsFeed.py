@@ -6,6 +6,24 @@ import pytz
 import config
 
 
+def get_team_abbr(team, league):
+	if league == 'NBA':
+		if team == 'BRO':
+			return 'BKN'
+		elif team == 'OKL':
+			return 'OKC'
+		else:
+			return team
+	elif league == 'NHL':
+		if team == 'FLO':
+			return 'FLA'
+		elif team == 'WPJ':
+			return 'WPG'
+		else:
+			return team
+	else:
+		return team
+
 class SportsFeed(object):
 	def __init__(self, league):
 		self.BASE_URL = 'https://www.mysportsfeeds.com/api/feed/pull/'
@@ -23,16 +41,19 @@ class SportsFeed(object):
 		try:
 			#Send request for json
 			response = requests.get(url, auth=(config.sports['username'], config.sports['password']))
-
-			games = json.loads(response.text, object_hook = lambda d: namedtuple('DailyGames', d.keys())(*d.values()))
-		
 			
-			for game in games.dailygameschedule.gameentry:
-				gameStartTime = self._localize_time(game.time)
-				
-				gameObj = SportsGame(game.awayTeam.Abbreviation, 
-							game.homeTeam.Abbreviation, gameStartTime, self.league)	
-				gameList.append(gameObj)
+			if response.text:
+				games = json.loads(response.text, 
+							object_hook = lambda d: namedtuple('DailyGames', d.keys())(*d.values()))
+			
+				#Create an object for each game
+				for game in games.dailygameschedule.gameentry:
+					gameStartTime = self._localize_time(game.time)
+					
+					gameObj = SportsGame(game.awayTeam.Abbreviation, 
+								game.homeTeam.Abbreviation, gameStartTime, self.league)	
+					gameList.append(gameObj)
+					
 		except Exception as e:
 			print(e)
 		
@@ -42,39 +63,6 @@ class SportsFeed(object):
 		#Return the list of games
 		return gameList
 		
-	def _get_season_start_and_end_year(self, date, regOrPost):
-		'''This method may not be needed anymore. This was used to get the years needed for
-		 the API call. The API now allows the current season to be requested'''
-		#Determine start and end year based on when the league season starts
-		if self.league == 'NFL':
-			if date.month > 3:
-				return '{0}-{1}'.format(date.year, date.year + 1)
-			else:
-				if regOrPost == 'regular':
-					return '{0}-{1}'.format(date.year - 1, date.year)
-				else:
-					#During playoffs, the begin and end year are the same (current year)
-					return '{0}-{1}'.format(date.year, date.year) 
-		elif self.league == 'NBA':
-			if date.month > 7:
-				return '{0}-{1}'.format(date.year, date.year + 1)
-			else:
-				if regOrPost == 'regular':
-					return '{0}-{1}'.format(date.year - 1, date.year)
-				else:
-					return '{0}-{1}'.format(date.year, date.year)
-		elif self.league == 'NHL':
-			if date.month > 7:
-				return '{0}-{1}'.format(date.year, date.year + 1)
-			else:
-				if regOrPost == 'regular':
-					return '{0}-{1}'.format(date.year - 1, date.year)
-				else:
-					return '{0}-{1}'.format(date.year, date.year)
-		elif self.league == 'MLB':
-			return '{0}-{1}'.format(date.year, date.year)
-		else:
-			return ''
 
 	def _localize_time(self, time):
 		'''Game times received from API are in Eastern Time. This converts
@@ -99,29 +87,13 @@ class SportsFeed(object):
 class SportsGame(object):
 	def __init__(self, awayTeam, homeTeam, startTime, league):
 		#Change some of the abbreviations
-		self.awayTeam = self.get_team_abbr(awayTeam, league)
+		self.awayTeam = get_team_abbr(awayTeam, league)
 		self.awayImgPath = 'images/' + league + '/' + self.awayTeam + '.png'
 		
-		self.homeTeam = self.get_team_abbr(homeTeam, league)		
+		self.homeTeam = get_team_abbr(homeTeam, league)		
 		self.homeImgPath = 'images/' + league + '/' + self.homeTeam + '.png'
 		
 		self.startTime = startTime
 		self.league = league
 		
-	def get_team_abbr(self, team, league):
-		if league == 'NBA':
-			if team == 'BRO':
-				return 'BKN'
-			elif team == 'OKL':
-				return 'OKC'
-			else:
-				return team
-		elif league == 'NHL':
-			if team == 'FLO':
-				return 'FLA'
-			elif team == 'WPJ':
-				return 'WPG'
-			else:
-				return team
-		else:
-			return team
+	
