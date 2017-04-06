@@ -56,7 +56,8 @@ class SportsFeed(object):
 					gameList.append(gameObj)
 					
 		except Exception as e:
-			print(datetime.datetime.now().strftime('%c') + ' - daily games - ' + str(e))
+			print(datetime.datetime.now().strftime('%c') + ' - daily games - ' + 
+					self.league + ' - ' + str(e))
 		
 		self.lastGameUpdate = datetime.datetime.now()
 		self.todaysGames = gameList
@@ -94,15 +95,18 @@ class SportsFeed(object):
 					for team in conf['teamentry']:
 						teamAbbr = team['team']['Abbreviation']
 						rank = team['rank']
-						wins = team['stats']['Wins']['#text']
-						losses = team['stats']['Losses']['#text']
+						
+						#The wins and losses for NHL are nested in another 'stats' object
+						#Pretty sure this is a bug with the API, but still need a workaround 
+						wins = team['stats']['Wins']['#text'] if self.league != 'NHL' else team['stats']['stats']['Wins']['#text']
+						losses = team['stats']['Losses']['#text'] if self.league != 'NHL' else team['stats']['stats']['Losses']['#text']
 						extraStats = {}
 						
 						if self.league == 'NHL':
-							extraStats['OTL'] = team['stats']['OvertimeLosses']['#text']
-							extraStats['PTS'] = team['stats']['Points']['#text']
+							extraStats['OTL'] = team['stats']['stats']['OvertimeLosses']['#text']
+							extraStats['PTS'] = team['stats']['stats']['Points']['#text']
 						elif self.league == 'NFL':
-							extraStats['Ties'] = team['stats']['Ties']['#text']
+							extraStats['T'] = team['stats']['Ties']['#text']
 						else:
 							extraStats['GB'] = team['stats']['GB']['#text']
 							
@@ -113,7 +117,8 @@ class SportsFeed(object):
 					conferenceList.append(conference)
 											
 		except Exception as e:
-			print(datetime.datetime.now().strftime('%c') + ' - standings - ' + str(e))
+			print(datetime.datetime.now().strftime('%c') + ' - standings - ' + 
+					self.league + ' - ' + str(e))
 			
 		self.conferenceStandings = conferenceList
 		return conferenceList
@@ -155,7 +160,7 @@ class SportsGame(object):
 class TeamStandingInfo(object):
 	def __init__(self, league, teamAbbr, rank, wins, losses, extraStats):
 		self.teamAbbr = get_team_abbr(teamAbbr, league)
-		self.teamImgPath = 'images/' + league + '/' + self.team + '.png'
+		self.teamImgPath = 'images/' + league + '/' + self.teamAbbr + '.png'
 		self.rank = rank
 		self.wins = wins
 		self.losses = losses
