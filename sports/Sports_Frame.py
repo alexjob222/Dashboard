@@ -95,10 +95,15 @@ class LeagueFrame(tk.Frame):
 		self.todaysGames = TodaysGamesFrame(self)
 		self.todaysGames.pack(pady=10)
 		
+		self.conferenceStandings = LeagueStandingsFrame(self)
+		self.conferenceStandings.pack()
+		
 		self.update_frame()
 	
 	def update_frame(self):
 		self.todaysGames.update_frame(self.leagueObj)
+		
+		self.conferenceStandings.update_frame(self.leagueObj)
 		
 		self.after(self.updateFreq, self.update_frame)
 		
@@ -152,4 +157,92 @@ class FavoriteTeamsFrame(tk.Frame):
 				
 		#Update the game frames
 		self.add_games_to_frame()
+		
+		
+class ConferenceFrame(tk.Frame):
+	def __init__(self, parent, conference):
+		tk.Frame.__init__(self, parent, bg='black')
+		
+		lblConferenceName = tk.Label(self, text=conference.name, bg='black', fg='white', font=('Arial', 18, 'bold'))
+		lblConferenceName.grid(row=0, columnspan=5, pady=10)
+		 
+		pathname = os.path.dirname(__file__)
+		rowCount = 1
+		
+		for team in conference.teams:
+			lblRank = tk.Label(self, text=team.rank, bg='black', fg='white', font=('Arial', 16))
+			lblRank.grid(row=rowCount, column=0, padx=2)
+			
+			team.teamImg = size_image(45, 45, os.path.join(pathname, team.teamImgPath))
+			lblImage = tk.Label(self, bg='black', image=team.teamImg)
+			lblImage.grid(row=rowCount, column=1, padx=2)
+			
+			lblTeam = tk.Label(self, text=team.teamAbbr, bg='black', fg='white', font=('Arial', 16))
+			lblTeam.grid(row=rowCount, column=2, padx=2)
+			
+			lblRecord = tk.Label(self, text=self._get_record_string(team), bg='black', fg='white', font=('Arial', 16))
+			lblRecord.grid(row=rowCount, column=3, padx=2)
+			
+			lblExtraInfo = tk.Label(self, bg='black', fg='white', font=('Arial', 16))
+			if 'GB' in team.extraStats:
+				lblExtraInfo.config(text=team.extraStats['GB'])
+			else:
+				lblExtraInfo.config(text=team.extraStats['PTS']) #NHL only one without GB
+			lblExtraInfo.grid(row=rowCount, column=4, padx=2)
+			
+			rowCount = rowCount + 1
+		
+		
+	def _get_record_string(self, teamInfo):
+		recordString = teamInfo.wins + '-' + teamInfo.losses
+		
+		#Add ties and overtime losses if available (NFL and NHL)
+		if 'T' in teamInfo.extraStats:
+			ties = teamInfo.extraStats['T']
+			if int(ties) > 0:
+				recordString = recordString + '-' + ties
+		elif 'OTL' in teamInfo.extraStats:
+			recordString = recordString + '-' + teamInfo.extraStats['OTL']
+		
+		return recordString
+		
+		
+class LeagueStandingsFrame(tk.Frame):
+	def __init__(self, parent):
+		tk.Frame.__init__(self, parent, bg='black')
+		
+		self.lastStandingsUpdate = None
+		self.frameList = list()
+		
+	def update_standings(self, standings):
+		#Destroy frames and clear lists
+		for frame in self.frameList:
+			frame.destroy()
+			
+		self.frameList.clear()
+		
+		columnCount = 0
+		
+		#Create frame for each conference
+		for conference in standings:
+			frame = ConferenceFrame(self, conference)
+			self.frameList.append(frame)
+			frame.grid(row=0, column=columnCount, sticky='n', padx=10)
+			
+			columnCount = columnCount + 1
+	
+	def update_frame(self, leagueObj):
+		#Update if not yet set
+		if self.lastStandingsUpdate == None:
+			standings = leagueObj.get_conference_standings()			
+			self.lastStandingsUpdate = datetime.datetime.now()
+			
+			self.update_standings(standings)
+			
+		#Update every 3 hours
+		elif (self.lastStandingsUpdate + datetime.timedelta(hours = 3)) < datetime.datetime.now():
+			standings = leagueObj.get_conference_standings()			
+			self.lastStandingsUpdate = datetime.datetime.now()
+			
+			self.update_standings(standings)
 		
