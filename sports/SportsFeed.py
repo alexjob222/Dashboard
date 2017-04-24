@@ -76,7 +76,7 @@ class SportsFeed(object):
 		else:
 			stats += 'GB'
 			
-		url = '{0}{1}/current/conference_team_standings.json?teamstats={2}'.format(
+		url = '{0}{1}/2016-2017-regular/conference_team_standings.json?teamstats={2}'.format(
 				self.BASE_URL, self.league, stats)
 		
 		conferenceList = list()
@@ -96,7 +96,7 @@ class SportsFeed(object):
 						teamAbbr = team['team']['Abbreviation']
 						rank = team['rank']
 						
-						#The wins and losses for NHL are nested in another 'stats' object
+						#The team stats for NHL are nested in another 'stats' object
 						#Pretty sure this is a bug with the API, but still need a workaround 
 						wins = team['stats']['Wins']['#text'] if self.league != 'NHL' else team['stats']['stats']['Wins']['#text']
 						losses = team['stats']['Losses']['#text'] if self.league != 'NHL' else team['stats']['stats']['Losses']['#text']
@@ -107,7 +107,7 @@ class SportsFeed(object):
 							extraStats['PTS'] = team['stats']['stats']['Points']['#text']
 						elif self.league == 'NFL':
 							extraStats['T'] = team['stats']['Ties']['#text']
-							extraStats['GB'] = '0.0'
+							extraStats['GB'] = '0.0' #GB not included in the NFL pull
 						else:
 							extraStats['GB'] = team['stats']['GB']['#text']
 							
@@ -174,15 +174,55 @@ class TeamStandingInfo(object):
 
 class Conference(object):
 	def __init__(self, name, teams):
-		self.name = self.set_conference_name(name)
+		self.name = self._set_conference_name(name)
 		self.teams = teams
-	
-	def set_conference_name(self, name):
+		
+		#The feed returns a 'GB' field, but it isn't actually calculated. Guess I'll do it myself...
+		self.set_games_back()
+		
+	def _set_conference_name(self, name):
 		if name == 'Eastern':
 			return 'East'
 		elif name == 'Western':
 			return 'West'
 		else:
 			return name
+			
+	def set_games_back(self):
+		if not self.teams or 'GB' not in self.teams[0].extraStats:
+			return
+			
+		#Find the team ranked first in the standings
+		firstPlaceWins = 0.0
+		firstPlaceLosses = 0.0
+		
+		for team in self.teams:
+			if int(team.rank) == 1:
+				firstPlaceWins = float(team.wins)
+				firstPlaceLosses = float(team.losses)
+				
+				#Factor in ties - they count as half of a win AND half of a loss
+				if 'T' in team.extraStats:
+					ties = int(team.extraStats['T'])
+					
+					firstPlaceWins += (ties * 0.5)
+					firstPlaceLosses += (ties * 0.5)
+				
+				break
+		
+		#Calculate the games back for each team
+		for team in self.teams:
+			wins = float(team.wins)
+			losses = float(team.losses)
+			
+			if 'T' in team.extraStats:
+				ties = int(team.extraStats['T'])
+				wins += (ties * 0.5)
+				losses += (ties * 0.5)
+				
+			gamesBack = (abs(firstPlaceWins - wins) + abs(firstPlaceLosses - losses)) / 2
+			
+			#Add as a string to keep consistent - API returns all string values
+			team.extraStats['GB'] = str(gamesBack)
 		
 	
