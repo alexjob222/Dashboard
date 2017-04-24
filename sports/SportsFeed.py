@@ -76,7 +76,7 @@ class SportsFeed(object):
 		else:
 			stats += 'GB'
 			
-		url = '{0}{1}/2016-2017-regular/conference_team_standings.json?teamstats={2}'.format(
+		url = '{0}{1}/current/conference_team_standings.json?teamstats={2}'.format(
 				self.BASE_URL, self.league, stats)
 		
 		conferenceList = list()
