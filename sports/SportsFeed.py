@@ -7,6 +7,8 @@ import config
 
 
 def get_team_abbr(team, league):
+	'''I didn't like some of the abbreviations returned from the API,
+	so this method returns the abbreviations that I am used to seeing'''
 	if league == 'NBA':
 		if team == 'BRO':
 			return 'BKN'

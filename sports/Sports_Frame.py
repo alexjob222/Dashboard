@@ -12,8 +12,9 @@ class GameFrame(tk.Frame):
 		tk.Frame.__init__(self, parent, bg='black')
 		
 		pathname = os.path.dirname(__file__)
+		imageSize = 45
 		
-		self.imgAwayTeam = size_image(45, 45, os.path.join(pathname, game.awayImgPath))
+		self.imgAwayTeam = size_image(imageSize, imageSize, os.path.join(pathname, game.awayImgPath))
 		self.lblAwayImage = tk.Label(self, bg='black', image=self.imgAwayTeam)
 		self.lblAwayText = tk.Label(self, font=('Arial', 18), fg='white', bg='black', text=game.awayTeam)
 		
@@ -22,6 +23,8 @@ class GameFrame(tk.Frame):
 		self.lblHomeText = tk.Label(self, font=('Arial', 18), fg='white', bg='black', text=game.homeTeam)
 		
 		self.lblTime = tk.Label(self, font=('Arial', 18), fg='white', bg='black', text=game.startTime)
+		
+		self.height = imageSize * 2 #Image is bigger than the text
 		
 		#Arrange into a grid
 		self.lblAwayImage.grid(row=0, column=0)
@@ -48,21 +51,33 @@ class TodaysGamesFrame(tk.Frame):
 			
 		self.frameList.clear()
 		
-		#Get games and create their frames
 		games = leagueObj.todaysGames
 		games.sort(key=lambda g: g.startTime, reverse=False)
 		
 		rowCount = 0
 		columnCount = 0
+		screenHeight = self.winfo_screenheight()
+		heightUsed = 0
+		
+		paddingY = 5
 		
 		for game in games:
 			gameFrame = GameFrame(self, game)
 			self.frameList.append(gameFrame)
-			gameFrame.grid(row=rowCount, column=columnCount, padx=10, pady=10)
 			
-			columnCount = (columnCount + 1) % 4
-			if columnCount == 0:
-				rowCount = rowCount + 1
+			#Determine how much screen space the widget will use			
+			widgetHeight = gameFrame.height + (paddingY * 2) #Include vertical padding 
+			
+			if (heightUsed + widgetHeight) > screenHeight:
+				heightUsed = widgetHeight
+				rowCount = 0
+				columnCount += 1
+			else:
+				heightUsed += widgetHeight
+			
+			gameFrame.grid(row=rowCount, column=columnCount, padx=10, pady=paddingY)
+			
+			rowCount += 1
 	
 	def update_frame(self, leagueObj):
 		#Update if not yet set
@@ -88,15 +103,18 @@ class LeagueFrame(tk.Frame):
 		
 		pathname = os.path.dirname(__file__)
 		
-		self.imgLogo = size_image(150, 150, os.path.join(pathname, 'images/' + leagueObj.league + '/logo.png'))
+		self.imgLogo = size_image(100, 100, os.path.join(pathname, 'images/' + leagueObj.league + '/logo.png'))
 		self.lblLeague = tk.Label(self, font=('Arial', 48), fg='white', bg='black', text=' ' + leagueObj.league, image=self.imgLogo, compound=tk.LEFT)
-		self.lblLeague.pack(pady=10, anchor='n')
+		self.lblLeague.grid(row=0, column=0, sticky='n', pady=10)
 		
 		self.todaysGames = TodaysGamesFrame(self)
-		self.todaysGames.pack(pady=10)
+		self.todaysGames.grid(row=0, rowspan=2, column=1, sticky='e')
 		
 		self.conferenceStandings = LeagueStandingsFrame(self)
-		self.conferenceStandings.pack()
+		self.conferenceStandings.grid(row=1, column=0, sticky='n')
+		
+		#Set the column to take up all available space
+		self.columnconfigure(0, weight=1)
 		
 		self.update_frame()
 	
