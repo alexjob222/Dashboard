@@ -24,7 +24,8 @@ class CalendarFrame(tk.Frame):
 		start = self._remove_leading_zero(startTime.strftime('%I:%M%p'))
 		end = self._remove_leading_zero(endTime.strftime('%I:%M%p'))
 		
-		return '{0} - {1}'.format(start, end)
+		#return '{0} - {1}'.format(start, end)
+		return start
 			
 	def _remove_leading_zero(self, string):
 		if string.startswith('0'):
@@ -59,7 +60,7 @@ class CalendarFrame(tk.Frame):
 				
 				
 				lblEvent = tk.Label(self.calFrame, fg='white', bg='black', font=('Arial', 18),
-							text='   {0}  {1}'.format(self._format_time(event.startTime, event.endTime), event.summary))
+							text='   {0} - {1}'.format(self._format_time(event.startTime, event.endTime), event.summary))
 					  
 				lblEvent.grid(row=rowCount, sticky='w')
 				rowCount = rowCount + 1
