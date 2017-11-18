@@ -66,6 +66,8 @@ class BottomLineProvider(object):
 		for fieldName in fields:
 			item = BottomLineItem(fieldName, fields[fieldName])
 			itemsList.append(item)
+			
+		return itemsList
 				
 
 class BottomLineItem(object):
