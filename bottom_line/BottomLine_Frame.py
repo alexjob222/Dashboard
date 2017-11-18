@@ -43,7 +43,7 @@ class BottomLineFrame(tk.Frame):
 		#Resize the header background
 		self.canvas.coords(self.headerBackground, 0, 0, dividerEnd, self.rectHeight)
 		
-		self.after(2.5 * 1000, self.scroll_text)
+		self.after(2500, self.scroll_text)
 	
 	def scroll_text(self):
 		self.canvas.move(self.text, -(self.scrollSpeed), 0)

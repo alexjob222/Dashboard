@@ -18,7 +18,7 @@ class GameFrame(tk.Frame):
 		self.lblAwayImage = tk.Label(self, bg='black', image=self.imgAwayTeam)
 		self.lblAwayText = tk.Label(self, font=('Arial', 18), fg='white', bg='black', text=game.awayTeam)
 		
-		self.imgHomeTeam = size_image(45, 45, os.path.join(pathname, game.homeImgPath))
+		self.imgHomeTeam = size_image(imageSize, imageSize, os.path.join(pathname, game.homeImgPath))
 		self.lblHomeImage = tk.Label(self, bg='black', image=self.imgHomeTeam)
 		self.lblHomeText = tk.Label(self, font=('Arial', 18), fg='white', bg='black', text=game.homeTeam)
 		
@@ -176,6 +176,8 @@ class FavoriteTeamsFrame(tk.Frame):
 		#Update the game frames
 		self.add_games_to_frame()
 		
+		self.after(self.updateFreq, self.update_frame)
+		
 		
 class ConferenceFrame(tk.Frame):
 	def __init__(self, parent, conference):
@@ -257,8 +259,8 @@ class LeagueStandingsFrame(tk.Frame):
 			
 			self.update_standings(standings)
 			
-		#Update every 3 hours
-		elif (self.lastStandingsUpdate + datetime.timedelta(hours = 3)) < datetime.datetime.now():
+		#Update every 6 hours
+		elif (self.lastStandingsUpdate + datetime.timedelta(hours = 6)) < datetime.datetime.now():
 			standings = leagueObj.get_conference_standings()			
 			self.lastStandingsUpdate = datetime.datetime.now()
 			

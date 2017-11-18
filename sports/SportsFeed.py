@@ -4,7 +4,7 @@ from collections import namedtuple
 import datetime
 import pytz
 import config
-
+from bottom_line.BottomLine import *
 
 def get_team_abbr(team, league):
 	'''I didn't like some of the abbreviations returned from the API,
@@ -31,7 +31,7 @@ def get_team_abbr(team, league):
 	else:
 		return team
 
-class SportsFeed(object):
+class SportsFeed(BottomLineProvider):
 	def __init__(self, league):
 		self.BASE_URL = 'https://www.mysportsfeeds.com/api/feed/pull/'
 		self.league = league
@@ -150,6 +150,31 @@ class SportsFeed(object):
 			timeString = timeString[1:]
 		
 		return timeString
+		
+	
+	def get_bottom_line_info(self):
+		itemsList = list()
+		
+		#Add the games for the day
+		if self.todaysGames is not None:
+			for game in self.todaysGames:
+				details = '{0} @ {1} - {2}'.format(game.awayTeam, game.homeTeam, game.startTime)
+				item = BottomLineItem(self.league, details)
+			
+				itemsList.append(item)
+		
+		#Add the league standings
+		if self.conferenceStandings is not None:
+			for conference in self.conferenceStandings:
+				details = '{0}: '.format(conference.name)
+				
+				for team in conference.teams:
+					details += '{0}. {1}  '.format(team.rank, team.teamAbbr)
+				
+				item = BottomLineItem(self.league, details)
+				itemsList.append(item)
+		
+		return itemsList
 	
 
 class SportsGame(object):
