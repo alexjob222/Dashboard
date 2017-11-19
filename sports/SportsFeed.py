@@ -23,7 +23,7 @@ def get_team_abbr(team, league):
 			return 'WPG'
 		else:
 			return team
-	elif leauge == 'NFL':
+	elif league == 'NFL':
 		if team == 'LA':
 			return 'LAR'
 		else:

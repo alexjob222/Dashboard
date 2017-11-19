@@ -108,7 +108,7 @@ class LeagueFrame(tk.Frame):
 		self.lblLeague.grid(row=0, column=0, sticky='n', pady=10)
 		
 		self.todaysGames = TodaysGamesFrame(self)
-		self.todaysGames.grid(row=0, rowspan=2, column=1, sticky='e')
+		self.todaysGames.grid(row=0, rowspan=2, column=1, sticky='ne')
 		
 		self.conferenceStandings = LeagueStandingsFrame(self)
 		self.conferenceStandings.grid(row=1, column=0, sticky='n')
