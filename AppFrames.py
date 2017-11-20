@@ -7,6 +7,7 @@ from Clock_Frame import *
 from weather import Weather_Frame
 from google_calendar import Calendar_Frame
 from sports import Sports_Frame, SportsFeed
+from bottom_line import BottomLine_Frame
 
 
 class AppFrames(object):
@@ -29,6 +30,7 @@ class AppFrames(object):
 		self.mainFrame = self.create_main_frame()
 		
 		self.mainFrame.rowconfigure(0, weight=1)
+		self.mainFrame.rowconfigure(1, weight=1)
 		self.mainFrame.columnconfigure(0, weight=1)
 
 		self.appFrames.append(self.mainFrame)
@@ -53,6 +55,8 @@ class AppFrames(object):
 		#Set the frames to expand to window width
 		self.mainWindow.rowconfigure(0, weight=1)
 		self.mainWindow.columnconfigure(0, weight=1)
+		
+		self.appFrames[0].tkraise()
 		
 		self.mainWindow.attributes("-fullscreen", True)
 		self.mainWindow.mainloop()
@@ -81,6 +85,11 @@ class AppFrames(object):
 		favoriteTeams.pack(pady=35, anchor='e')
 		
 		rightFrame.grid(row=0, column=1, padx=15, sticky='ne')
+		
+		bottomLineProviders = [self.nbaFeed, self.nhlFeed, self.nflFeed, self.mlbFeed]
+		bottomLineFrame = BottomLine_Frame.BottomLineFrame(mainFrame, bottomLineProviders)
+		
+		bottomLineFrame.grid(row=1, columnspan=2, sticky='wse')
 		
 		return mainFrame
 		
