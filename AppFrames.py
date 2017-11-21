@@ -56,6 +56,9 @@ class AppFrames(object):
 		self.mainWindow.rowconfigure(0, weight=1)
 		self.mainWindow.columnconfigure(0, weight=1)
 		
+		#Hide the cursor
+		self.mainWindow.config(cursor='none')
+		
 		self.appFrames[0].tkraise()
 		
 		self.mainWindow.attributes("-fullscreen", True)
