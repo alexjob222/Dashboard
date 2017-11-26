@@ -116,7 +116,7 @@ class SportsFeed(BottomLineProvider):
 							extraStats['T'] = team['stats']['Ties']['#text']
 							extraStats['GB'] = '0.0' #GB not included in the NFL pull
 						else:
-							extraStats['GB'] = team['stats']['GB']['#text']
+							extraStats['GB'] = team['stats']['GamesBack']['#text']
 							
 						teamInfo = TeamStandingInfo(self.league, teamAbbr, rank, wins, losses, extraStats)
 						teamList.append(teamInfo)

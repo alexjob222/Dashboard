@@ -23,7 +23,7 @@ class BottomLineFrame(tk.Frame):
 		self.text = self.canvas.create_text(0, self.textY, fill='white', anchor='nw', font='Arial 18 bold', text='')
 		self.headerBackground = self.canvas.create_rectangle(0, 0, 10, self.rectHeight, fill='black')
 		self.divider = self.canvas.create_rectangle(0, 0, self.dividerWidth, self.rectHeight, fill='white')
-		self.header = self.canvas.create_text(5, self.textY, fill='white', anchor='nw', font='Arial 18 bold', text='')
+		self.header = self.canvas.create_text(10, self.textY, fill='white', anchor='nw', font='Arial 18 bold', text='')
 		
 		self.display_next_item()
 		
