@@ -33,7 +33,7 @@ def get_team_abbr(team, league):
 
 class SportsFeed(BottomLineProvider):
 	def __init__(self, league):
-		self.BASE_URL = 'https://www.mysportsfeeds.com/api/feed/pull/'
+		self.BASE_URL = 'https://api.mysportsfeeds.com/v1.0/pull/'
 		self.league = league
 		self.lastGameUpdate = None
 		self.todaysGames = None
