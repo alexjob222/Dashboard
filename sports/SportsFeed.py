@@ -31,6 +31,9 @@ def get_team_abbr(team, league):
 	else:
 		return team
 
+def get_team_img_path(league, teamAbbr):
+	return 'images/' + league + '/' + teamAbbr + '.png'
+
 class SportsFeed(BottomLineProvider):
 	def __init__(self, league):
 		self.BASE_URL = 'https://api.mysportsfeeds.com/v1.0/pull/'
@@ -181,10 +184,10 @@ class SportsGame(object):
 	def __init__(self, awayTeam, homeTeam, startTime, league):
 		#Change some of the abbreviations
 		self.awayTeam = get_team_abbr(awayTeam, league)
-		self.awayImgPath = 'images/' + league + '/' + self.awayTeam + '.png'
+		self.awayImgPath = get_team_img_path(league, self.awayTeam)
 		
 		self.homeTeam = get_team_abbr(homeTeam, league)		
-		self.homeImgPath = 'images/' + league + '/' + self.homeTeam + '.png'
+		self.homeImgPath = get_team_img_path(league, self.homeTeam)
 		
 		self.startTime = startTime
 		self.league = league
@@ -193,7 +196,7 @@ class SportsGame(object):
 class TeamStandingInfo(object):
 	def __init__(self, league, teamAbbr, rank, wins, losses, extraStats):
 		self.teamAbbr = get_team_abbr(teamAbbr, league)
-		self.teamImgPath = 'images/' + league + '/' + self.teamAbbr + '.png'
+		self.teamImgPath = get_team_img_path(league, self.teamAbbr)
 		self.rank = rank
 		self.wins = wins
 		self.losses = losses

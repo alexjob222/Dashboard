@@ -55,6 +55,9 @@ class CurrentWeatherFrame(tk.Frame):
 		self.lblWind.pack()
 	
 	def update_weather(self, status):
+		if status is None:
+			return
+
 		degreeSymbol = '\u00b0'
 		
 		#Round the temp and wind values
@@ -99,6 +102,9 @@ class ForecastFrame(tk.Frame):
 		return frame
 		
 	def update_forecast(self, forecast):
+		if not forecast:
+			return
+
 		#Destroy each frame and then clear the list
 		for frame in self.frameList:
 			frame.destroy()

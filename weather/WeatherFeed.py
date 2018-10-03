@@ -18,44 +18,51 @@ class WeatherFeed(object):
 		url = '{0}weather?id={1}&{2}'.format(self.baseURL, 
 				self.cityID, self._get_url_end())
 				
-		response = requests.get(url)
-		
-		status = json.loads(response.text, object_hook = lambda d: namedtuple('CurrentWeather', d.keys())(*d.values()))
-		w = status.weather[0]
-		sunrise = datetime.datetime.fromtimestamp(status.sys.sunrise)
-		sunset = datetime.datetime.fromtimestamp(status.sys.sunset)
-		
-		#Build the return object
-		currentWeather = WeatherStatus(w.description, 
-				self.get_weather_img(w.id, w.icon), status.main.temp,
-				status.wind.speed, self._get_wind_direction(status.wind.deg),
-				sunrise, sunset)
-				
-		return currentWeather
+		try:
+			response = requests.get(url)
+			
+			status = json.loads(response.text, object_hook = lambda d: namedtuple('CurrentWeather', d.keys())(*d.values()))
+			w = status.weather[0]
+			sunrise = datetime.datetime.fromtimestamp(status.sys.sunrise)
+			sunset = datetime.datetime.fromtimestamp(status.sys.sunset)
+			
+			#Build the return object
+			currentWeather = WeatherStatus(w.description, 
+					self.get_weather_img(w.id, w.icon), status.main.temp,
+					status.wind.speed, self._get_wind_direction(status.wind.deg),
+					sunrise, sunset)
+					
+			return currentWeather
+		except Exception as e:
+			print(datetime.datetime.now().strftime('%c') + ' - current weather - ' + str(e))
+			return None
 		
 		
 	def get_upcoming_forecast(self, dayCount):
 		if dayCount < 1 or dayCount > 16:
 			raise ValueError("dayCount must be between 1 and 16 (inclusive)")
 		
+		fList = list()
 		url = '{0}forecast/daily?id={1}&cnt={2}&{3}'.format(
 				self.baseURL, self.cityID, dayCount, self._get_url_end())
 		
-		response = requests.get(url)
-		
-		forecast = json.loads(response.text, object_hook = lambda d: namedtuple('Forecast', d.keys())(*d.values()))
-		fList = list()
-		
-		#Create an object for each day and add it to the list
-		for day in forecast.list:
-			w = day.weather[0]
-		
-			obj = Forecast(datetime.datetime.fromtimestamp(day.dt),
-				  day.temp.min, day.temp.max, day.temp.day, day.temp.night,
-				  w.description, self.get_weather_img(w.id, w.icon),
-				  day.speed, self._get_wind_direction(day.deg))
-				  
-			fList.append(obj)
+		try:
+			response = requests.get(url)
+			
+			forecast = json.loads(response.text, object_hook = lambda d: namedtuple('Forecast', d.keys())(*d.values()))
+			
+			#Create an object for each day and add it to the list
+			for day in forecast.list:
+				w = day.weather[0]
+			
+				obj = Forecast(datetime.datetime.fromtimestamp(day.dt),
+					day.temp.min, day.temp.max, day.temp.day, day.temp.night,
+					w.description, self.get_weather_img(w.id, w.icon),
+					day.speed, self._get_wind_direction(day.deg))
+					
+				fList.append(obj)
+		except Exception as e:
+			print(datetime.datetime.now().strftime('%c') + ' - forecast - ' + str(e))
 		
 		return fList
 		
