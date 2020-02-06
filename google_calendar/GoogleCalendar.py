@@ -43,29 +43,33 @@ class GoogleCalendar(object):
 		return parsedDate
 	
 	def get_calendar_events(self, maxEvents):
-		credentials = self._get_calendar_credentials()
-		http = credentials.authorize(httplib2.Http())
-		service = discovery.build('calendar', 'v3', http=http)
-		
-		now = datetime.datetime.utcnow().isoformat() + 'Z'
-		
-		#Get upcoming events
-		eventsResult = service.events().list(
-			calendarId = 'primary', timeMin = now, maxResults = maxEvents,
-			singleEvents = True, orderBy = 'startTime').execute()
-		events = eventsResult.get('items', [])
-		
-		#Put the events into a list
 		eventList = list()
-		
-		for event in events:
-			start = event['start'].get('dateTime', event['start'].get('date'))
-			end = event['end'].get('dateTime', event['end'].get('date'))
+
+		try:
+			credentials = self._get_calendar_credentials()
+			http = credentials.authorize(httplib2.Http())
+			service = discovery.build('calendar', 'v3', http=http)
 			
-			calEvent = CalendarEvent(self._parse_from_ISO(start), self._parse_from_ISO(end), event['summary'])
-			eventList.append(calEvent)
+			now = datetime.datetime.utcnow().isoformat() + 'Z'
+			
+			#Get upcoming events
+			eventsResult = service.events().list(
+				calendarId = 'primary', timeMin = now, maxResults = maxEvents,
+				singleEvents = True, orderBy = 'startTime').execute()
+			events = eventsResult.get('items', [])
+			
+			#Put the events into a list
+			for event in events:
+				start = event['start'].get('dateTime', event['start'].get('date'))
+				end = event['end'].get('dateTime', event['end'].get('date'))
+				
+				calEvent = CalendarEvent(self._parse_from_ISO(start), self._parse_from_ISO(end), event['summary'])
+				eventList.append(calEvent)
+		except Exception as e:
+			print(datetime.datetime.now().strftime('%c') + ' - calendar - ' + str(e))
 		
 		return eventList
+
 		
 		
 class CalendarEvent(object):
